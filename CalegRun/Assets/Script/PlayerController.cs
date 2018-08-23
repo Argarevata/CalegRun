@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
 	private Rigidbody2D MyBody;
 	public float Speed;
+	public float NormalSpeed = 6;
 	public float JumpForce;
 
 	[SerializeField]
@@ -16,12 +18,15 @@ public class PlayerController : MonoBehaviour {
 	private float ActualSlideCoolDown=0.3f;
 
 	public Animator Anim;
+	public Slider HealthBar;
+	public int Health;
 
 	// Use this for initialization
 	void Start () {
 		MyBody = GetComponent<Rigidbody2D> ();
 		Grounded = true;
 		Anim = GetComponentInChildren<Animator> ();
+		Health = 100;
 	}
 	
 	// Update is called once per frame
@@ -31,15 +36,17 @@ public class PlayerController : MonoBehaviour {
 		if ((Input.GetKeyDown (KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && Grounded == true) {
 			Jump ();
 		}
-		if (Input.GetKeyDown (KeyCode.DownArrow) && ActualSlideCoolDown>=SlideCoolDown) {
+		if (Input.GetKeyDown (KeyCode.DownArrow) && ActualSlideCoolDown>=SlideCoolDown && Grounded == true) {
 			Slide ();
 		}
 		if (ActualSlideCoolDown >= SlideCoolDown) {
 			Anim.SetBool ("Slide", false);
+			Speed = NormalSpeed;
 		}
+		HealthBar.value = Health;
 	}
 
-	private void Jump()
+	public void Jump()
 	{
 		MyBody.velocity = new Vector2 (Speed, JumpForce);
 		Anim.SetBool ("Jump", true);
@@ -47,8 +54,9 @@ public class PlayerController : MonoBehaviour {
 		Grounded = false;
 	}
 
-	private void Slide()
+	public void Slide()
 	{
+		Speed += 4;
 		Anim.SetBool ("Slide", true);
 		ActualSlideCoolDown = 0f;
 	}
